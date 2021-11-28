@@ -19,11 +19,12 @@ library
     default-language: Haskell2010
     ghc-options:      -Wall
     exposed-modules:  Aoc
+                    , Aoc.Parsers
                     , Aoc.Problems
                     , Aoc.Sort
-    other-modules:    Aoc.Y2020.P1
                     , Aoc.Y2020
-                    , Aoc.Parsers
+                    , Aoc.Y2020.P1
+    other-modules:    
     build-depends:    base ^>=4.14.1.0
                     , containers
                     , megaparsec
@@ -35,7 +36,7 @@ library
 executable advent-of-code
     main-is:          Main.hs
     hs-source-dirs:   app
-    ghc-options:      -Wall
+    ghc-options:      -threaded -with-rtsopts=-N -Wall
     default-language: Haskell2010
     build-depends:    base ^>=4.14.1.0
                     , advent-of-code
@@ -43,3 +44,16 @@ executable advent-of-code
                     , containers
                     , optparse-applicative
                     , text
+
+test-suite tests
+  default-language:   Haskell2010
+  type:               exitcode-stdio-1.0
+  main-is:            Spec.hs
+  hs-source-dirs:     test
+  ghc-options:        -threaded -with-rtsopts=-N -Wall
+  other-modules:      Aoc.Y2020.P1Spec
+  build-depends:      base ^>=4.14.1.0
+                    , advent-of-code
+                    , hspec
+                    , QuickCheck
+                    , vector
