@@ -1,6 +1,0 @@
-cradle:
-  cabal:
-    - path: "./src"
-      component: "lib:advent-of-code"
-    - path: "./app"
-      component: "exe:advent-of-code"
