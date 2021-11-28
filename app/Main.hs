@@ -55,9 +55,10 @@ parseOpts =
       )
     <*> strOption
       ( long "year"
-      <> short 'y'
-      <> help "the competition year to run"
-      <> value "2021")
+          <> short 'y'
+          <> help "the competition year to run"
+          <> value "2021"
+      )
     <*> (parseFile <|> parseStdIn)
 
 run :: Opts -> IO ()
