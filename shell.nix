@@ -11,6 +11,7 @@ pkgs.haskellPackages.shellFor {
   buildInputs = [ pkgs.cabal-install
                   pkgs.cabal2nix
                   pkgs.haskell-language-server
+                  pkgs.ormolu
                 ];
   withHoogle = true;
 }
