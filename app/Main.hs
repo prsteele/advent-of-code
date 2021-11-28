@@ -22,6 +22,7 @@ data InputSource
 
 data Opts = Opts
   { _problem :: String,
+    _year :: String,
     _input :: InputSource
   }
   deriving (Show)
@@ -52,11 +53,16 @@ parseOpts =
           <> short 'p'
           <> help "the problem number to run"
       )
+    <*> strOption
+      ( long "year"
+      <> short 'y'
+      <> help "the competition year to run"
+      <> value "2021")
     <*> (parseFile <|> parseStdIn)
 
 run :: Opts -> IO ()
-run (Opts problem input) =
-  case M.lookup problem problems of
+run (Opts problem year input) =
+  case M.lookup year problems >>= M.lookup problem of
     Nothing -> putStrLn ("Unknown problem " <> problem) >> exitFailure
     Just p -> do
       inputText <- case input of

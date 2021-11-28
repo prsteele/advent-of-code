@@ -9,10 +9,11 @@ import Aoc.Sort (mutInit, sort)
 import Data.Maybe (fromMaybe)
 import qualified Data.Vector.Unboxed as V
 import qualified Data.Vector.Unboxed.Mutable as M
+import Text.Megaparsec (eof)
 import Text.Megaparsec.Char (space)
 
 parser :: Parser (V.Vector Int)
-parser = V.fromList <$> P.delimited P.int space
+parser = V.fromList <$> P.delimited P.int space <* eof
 
 solution :: Solution
 solution input = P.parse parser input >>= solve >>= print

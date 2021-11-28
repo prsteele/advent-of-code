@@ -22,6 +22,7 @@ library
                     , Aoc.Problems
                     , Aoc.Sort
     other-modules:    Aoc.Y2020.P1
+                    , Aoc.Y2020
                     , Aoc.Parsers
     build-depends:    base ^>=4.14.1.0
                     , containers
