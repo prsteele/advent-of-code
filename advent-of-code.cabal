@@ -26,6 +26,7 @@ library
                     , Aoc.Y2020.P1
                     , Aoc.Y2021
                     , Aoc.Y2021.P1
+                    , Aoc.Y2021.P2
     other-modules:    
     build-depends:    base ^>=4.14.1.0
                     , containers
