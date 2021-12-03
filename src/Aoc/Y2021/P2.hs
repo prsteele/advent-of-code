@@ -9,28 +9,22 @@ import qualified Data.Vector as V
 import Text.Megaparsec
 import Text.Megaparsec.Char
 
+solution :: Solution
+solution input = do
+  v <- P.parse parser input
+  print (solvePart1 v)
+  print (solvePart2 v)
+
 data Direction
   = Forward Int
   | Up Int
   | Down Int
   deriving (Eq, Show)
 
-data Position = Position
-  { _positionHorizontal :: Int
-  , _positionVertical :: Int
-  }
+data Position = Position Int Int
   deriving (Eq, Show)
 
-instance Semigroup Position where
-  Position x y <> Position x' y' = Position (x + x') (y + y')
-
-instance Monoid Position where
-  mempty = Position 0 0
-
-data Attitude = Attitude
-  { _attitudeAim :: Int
-  , _attitudePosition :: Position
-  }
+data Attitude = Attitude Int Position
   deriving (Eq, Show)
 
 parseDirection :: Parser Direction
@@ -39,36 +33,33 @@ parseDirection =
     <|> (Up <$> (string "up " *> P.int))
     <|> (Down <$> (string "down " *> P.int))
 
-parser :: Parser (V.Vector Direction)
-parser = V.fromList <$> P.delimited parseDirection space <* eof
-
-solution :: Solution
-solution input = do
-  v <- P.parse parser input
-  print (solvePart1 v)
-  print (solvePart2 v)
-
 solvePart1 :: V.Vector Direction -> Int
 solvePart1 v = horizontal * vertical
   where
-    Position horizontal vertical = follow v
+    Position horizontal vertical = part1FollowDirections v
+
+part1Follow :: Position -> Direction -> Position
+part1Follow (Position h v) (Up x) = Position h (v - x)
+part1Follow (Position h v) (Down x) = Position h (v + x)
+part1Follow (Position h v) (Forward x) = Position (h + x) v
+
+part1FollowDirections :: Foldable t => t Direction -> Position
+part1FollowDirections = foldl part1Follow (Position 0 0)
+
+parser :: Parser (V.Vector Direction)
+parser = V.fromList <$> P.delimited parseDirection space <* eof
 
 solvePart2 :: V.Vector Direction -> Int
 solvePart2 v = horizontal * vertical
   where
-    Attitude _ (Position horizontal vertical) = followAim v
+    (Position horizontal vertical) = part2FollowDirections v
 
-follow :: Foldable t => t Direction -> Position
-follow = foldr (mappend . go) (Position 0 0)
+part2FollowDirections :: Foldable t => t Direction -> Position
+part2FollowDirections directions = position
   where
-    go (Up x) = Position 0 (-x)
-    go (Down x) = Position 0 x
-    go (Forward x) = Position x 0
+    Attitude _ position = foldl part2Follow (Attitude 0 (Position 0 0)) directions
 
-followAim :: Foldable t => t Direction -> Attitude
-followAim = foldl (flip adjust) (Attitude 0 mempty)
-
-adjust :: Direction -> Attitude -> Attitude
-adjust (Down x) a@(Attitude aim _) = a { _attitudeAim = aim + x }
-adjust (Up x) a@(Attitude aim _) = a { _attitudeAim = aim - x }
-adjust (Forward x) a@(Attitude aim (Position h v)) = a { _attitudePosition = Position (h + x) (v + aim * x)}
+part2Follow :: Attitude -> Direction -> Attitude
+part2Follow (Attitude aim p) (Down x) = Attitude (aim + x) p
+part2Follow (Attitude aim p) (Up x) = Attitude (aim - x) p
+part2Follow (Attitude aim (Position h v)) (Forward x) = Attitude aim (Position (h + x) (v + aim * x))
