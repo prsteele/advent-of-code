@@ -27,6 +27,29 @@ library
                     , Aoc.Y2021
                     , Aoc.Y2021.P1
                     , Aoc.Y2021.P2
+                    , Aoc.Y2021.P3
+                    , Aoc.Y2021.P4
+                    , Aoc.Y2021.P5
+                    , Aoc.Y2021.P6
+                    , Aoc.Y2021.P7
+                    , Aoc.Y2021.P8
+                    , Aoc.Y2021.P9
+                    , Aoc.Y2021.P10
+                    , Aoc.Y2021.P11
+                    , Aoc.Y2021.P12
+                    , Aoc.Y2021.P13
+                    , Aoc.Y2021.P14
+                    , Aoc.Y2021.P15
+                    , Aoc.Y2021.P16
+                    , Aoc.Y2021.P17
+                    , Aoc.Y2021.P18
+                    , Aoc.Y2021.P19
+                    , Aoc.Y2021.P20
+                    , Aoc.Y2021.P21
+                    , Aoc.Y2021.P22
+                    , Aoc.Y2021.P23
+                    , Aoc.Y2021.P24
+                    , Aoc.Y2021.P25
     other-modules:    
     build-depends:    base ^>=4.14.1.0
                     , containers
@@ -55,7 +78,30 @@ test-suite tests
   hs-source-dirs:     test
   ghc-options:        -threaded -with-rtsopts=-N -Wall
   other-modules:      Aoc.Y2020.P1Spec
-                    , Aoc.Y2021.P1Spec
+                    , Aoc.Y2021.P2Spec
+                    , Aoc.Y2021.P3Spec
+                    , Aoc.Y2021.P4Spec
+                    , Aoc.Y2021.P5Spec
+                    , Aoc.Y2021.P6Spec
+                    , Aoc.Y2021.P7Spec
+                    , Aoc.Y2021.P8Spec
+                    , Aoc.Y2021.P9Spec
+                    , Aoc.Y2021.P10Spec
+                    , Aoc.Y2021.P11Spec
+                    , Aoc.Y2021.P12Spec
+                    , Aoc.Y2021.P13Spec
+                    , Aoc.Y2021.P14Spec
+                    , Aoc.Y2021.P15Spec
+                    , Aoc.Y2021.P16Spec
+                    , Aoc.Y2021.P17Spec
+                    , Aoc.Y2021.P18Spec
+                    , Aoc.Y2021.P19Spec
+                    , Aoc.Y2021.P20Spec
+                    , Aoc.Y2021.P21Spec
+                    , Aoc.Y2021.P22Spec
+                    , Aoc.Y2021.P23Spec
+                    , Aoc.Y2021.P24Spec
+                    , Aoc.Y2021.P25Spec
   build-depends:      base ^>=4.14.1.0
                     , advent-of-code
                     , hspec
