@@ -12,13 +12,13 @@ maintainer:         steele.pat@gmail.com
 
 copyright:          2021 Patrick Steele
 extra-source-files:
-    README.md
+  README.md
 
 library
-    hs-source-dirs:   src
-    default-language: Haskell2010
-    ghc-options:      -Wall
-    exposed-modules:  Aoc
+  hs-source-dirs:     src
+  default-language:   Haskell2010
+  ghc-options:        -Wall
+  exposed-modules:    Aoc
                     , Aoc.Parsers
                     , Aoc.Problems
                     , Aoc.Sort
@@ -50,8 +50,9 @@ library
                     , Aoc.Y2021.P23
                     , Aoc.Y2021.P24
                     , Aoc.Y2021.P25
-    other-modules:    
-    build-depends:    base ^>=4.14.1.0
+  other-modules:
+  default-extensions: OverloadedStrings
+  build-depends:      base ^>=4.14.1.0
                     , containers
                     , megaparsec
                     , primitive
@@ -60,11 +61,12 @@ library
                     , vector-algorithms
 
 executable advent-of-code
-    main-is:          Main.hs
-    hs-source-dirs:   app
-    ghc-options:      -threaded -with-rtsopts=-N -Wall
-    default-language: Haskell2010
-    build-depends:    base ^>=4.14.1.0
+  main-is:            Main.hs
+  hs-source-dirs:     app
+  ghc-options:        -threaded -with-rtsopts=-N -Wall
+  default-language:   Haskell2010
+  default-extensions: OverloadedStrings
+  build-depends:      base ^>=4.14.1.0
                     , advent-of-code
                     , clock
                     , containers
@@ -102,8 +104,12 @@ test-suite tests
                     , Aoc.Y2021.P23Spec
                     , Aoc.Y2021.P24Spec
                     , Aoc.Y2021.P25Spec
+  default-extensions:
+                      OverloadedStrings
   build-depends:      base ^>=4.14.1.0
                     , advent-of-code
-                    , hspec
                     , QuickCheck
+                    , hspec
+                    , megaparsec
+                    , text
                     , vector
