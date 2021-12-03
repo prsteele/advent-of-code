@@ -45,16 +45,16 @@ parser = V.fromList <$> P.delimited parseDirection space <* eof
 solution :: Solution
 solution input = do
   v <- P.parse parser input
-  solvePart1 v
-  solvePart2 v
+  print (solvePart1 v)
+  print (solvePart2 v)
 
-solvePart1 :: V.Vector Direction -> IO ()
-solvePart1 v = print (horizontal * vertical)
+solvePart1 :: V.Vector Direction -> Int
+solvePart1 v = horizontal * vertical
   where
     Position horizontal vertical = follow v
 
-solvePart2 :: V.Vector Direction -> IO ()
-solvePart2 v = print (horizontal * vertical)
+solvePart2 :: V.Vector Direction -> Int
+solvePart2 v = horizontal * vertical
   where
     Attitude _ (Position horizontal vertical) = followAim v
 
@@ -72,5 +72,3 @@ adjust :: Direction -> Attitude -> Attitude
 adjust (Down x) a@(Attitude aim _) = a { _attitudeAim = aim + x }
 adjust (Up x) a@(Attitude aim _) = a { _attitudeAim = aim - x }
 adjust (Forward x) a@(Attitude aim (Position h v)) = a { _attitudePosition = Position (h + x) (v + aim * x)}
-
-sample = V.fromList [Forward 5, Down 5, Forward 8, Up 3, Down 8, Forward 2]
