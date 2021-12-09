@@ -4,10 +4,10 @@ module Aoc.Y2020.P1 where
 
 import Aoc (Solution)
 import Aoc.Parsers (Parser)
-import Data.Functor ((<&>))
 import qualified Aoc.Parsers as P
 import Aoc.Sort (sort')
-import qualified Data.Vector.Unboxed as V
+import Data.Functor ((<&>))
+import qualified Data.Vector as V
 import Text.Megaparsec (eof)
 import Text.Megaparsec.Char (space)
 
@@ -46,11 +46,11 @@ twoSum' v target =
               jx = v V.! j
            in case compare (ix + jx) target of
                 LT -> search (i + 1) j
-                EQ -> Just (ix , jx)
+                EQ -> Just (ix, jx)
                 GT -> search i (j - 1)
    in search 0 (V.length v - 1)
 
-threeSum ::  V.Vector Int -> Int -> IO (Maybe (Int, Int, Int))
+threeSum :: V.Vector Int -> Int -> IO (Maybe (Int, Int, Int))
 threeSum v target = sort' v <&> flip threeSum' target
 
 threeSum' :: V.Vector Int -> Int -> Maybe (Int, Int, Int)
