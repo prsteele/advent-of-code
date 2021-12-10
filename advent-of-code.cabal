@@ -54,8 +54,10 @@ library
   default-extensions: OverloadedStrings
   build-depends:      base ^>=4.14.1.0
                     , containers
+                    , extra
                     , megaparsec
                     , primitive
+                    , recursion-schemes
                     , text
                     , vector
                     , vector-algorithms
@@ -80,6 +82,7 @@ test-suite tests
   hs-source-dirs:     test
   ghc-options:        -threaded -with-rtsopts=-N -Wall
   other-modules:      Aoc.Y2020.P1Spec
+                    , Aoc.Y2021.P1Spec
                     , Aoc.Y2021.P2Spec
                     , Aoc.Y2021.P3Spec
                     , Aoc.Y2021.P4Spec

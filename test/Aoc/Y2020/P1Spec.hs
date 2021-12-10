@@ -1,12 +1,12 @@
 module Aoc.Y2020.P1Spec where
 
-import qualified Data.Vector.Unboxed as V
-import Test.Hspec
-import Test.QuickCheck
-import Test.QuickCheck.Monadic
 import Aoc.Y2020.P1
 import Data.Maybe (isNothing)
+import qualified Data.Vector as V
+import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
+import Test.QuickCheck
+import Test.QuickCheck.Monadic
 
 spec :: Spec
 spec = do
@@ -35,15 +35,14 @@ threeSumSpec =
             target <- pick arbitrary
             result <- run (threeSum v target)
             assert (isNothing result)
-          else
-            -- Regular case where there are at least three elements
-            let
-              target = V.sum (V.slice 0 3 v)
-            in do
-              result <- run (threeSum v target)
-              case result of
-                Nothing -> assert False
-                Just (x, y, z) -> assert (x + y + z == target) 
+          else -- Regular case where there are at least three elements
+
+            let target = V.sum (V.slice 0 3 v)
+             in do
+                  result <- run (threeSum v target)
+                  case result of
+                    Nothing -> assert False
+                    Just (x, y, z) -> assert (x + y + z == target)
     prop "computes correct results on arbitrary inputs (where there is no match)" $
       \nums -> monadicIO $ do
         let v = V.fromList nums
