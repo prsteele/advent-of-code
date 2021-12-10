@@ -6,13 +6,11 @@ module Aoc.Y2021.P4 where
 import Aoc (Solution)
 import Aoc.Parsers (Parser)
 import qualified Aoc.Parsers as P
-import Data.Functor
+import Data.List
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
 import Data.Tuple
-import qualified Data.Vector as V
 import Text.Megaparsec
 import Text.Megaparsec.Char
 
@@ -75,11 +73,11 @@ findWinners (Input nums' boards') = go nums' boards'
     go [] _ = []
     go (n : ns) boards =
       if null winners
-        then go ns markedBoards
-        else fmap (,n) winners
+        then go ns losers
+        else fmap (,n) winners ++ go ns losers
       where
         markedBoards = play n <$> boards
-        winners = filter isWinner markedBoards
+        (winners, losers) = partition isWinner markedBoards
 
 solution :: Solution
 solution input = do
@@ -93,7 +91,11 @@ solvePart1 input = case findWinners input of
   [] -> putStrLn "Didn't find a winner" >> pure 0
 
 solvePart2 :: Input -> IO Int
-solvePart2 = undefined
+solvePart2 input = case findWinners input of
+  [] -> putStrLn "Didn't find a winner" >> pure 0
+  winners -> print n >> print w >> pure (n * sum (unmarked w))
+    where
+      (w, n) = last winners
 
 sample :: T.Text
 sample =
