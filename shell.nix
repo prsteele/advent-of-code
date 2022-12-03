@@ -12,6 +12,7 @@ pkgs.haskellPackages.shellFor {
                   pkgs.cabal2nix
                   pkgs.haskell-language-server
                   pkgs.ormolu
+                  pkgs.python3
                 ];
   withHoogle = true;
 }

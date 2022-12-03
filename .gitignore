@@ -1,5 +1,6 @@
-# Editors
+# Emacs
 *~
+.dir-locals-2.el
 
 # Problem data
 data/

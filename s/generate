@@ -1,0 +1,31 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i python ../shell.nix
+
+import argparse
+from pathlib import Path
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--template", type=Path, required=True)
+    parser.add_argument("--output-name-template", type=str, required=True)
+    parser.add_argument("--output-directory", type=Path, required=True)
+
+    args = parser.parse_args()
+
+    generate(args.template, args.output_name_template, args.output_directory)
+
+
+def generate(template_file: Path, name_template: str, output_directory: Path) -> None:
+    with open(template_file, "r") as f:
+        template = f.read()
+
+    output_directory.mkdir(exist_ok=True)
+    for i in range(1, 25 + 1):
+        with open(output_directory / name_template.format(i=i), "w") as f:
+            f.write(template.format(i=i))
+
+
+if __name__ == "__main__":
+    main()
