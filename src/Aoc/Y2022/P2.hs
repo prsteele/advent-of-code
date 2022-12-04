@@ -35,7 +35,7 @@ parseLine :: Parser (Cypher, Cypher)
 parseLine = (,) <$> parseCypher <*> (space *> parseCypher)
 
 parser :: Parser ProblemInput
-parser = V.fromList <$> sepEndBy parseLine eol <* eof
+parser = V.fromList <$> P.linesOf parseLine <* eof
 
 score :: (RPS, RPS) -> Int
 score (x, y) = playScore y + gameScore x y

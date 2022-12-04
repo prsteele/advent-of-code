@@ -1,5 +1,6 @@
 module Aoc.Parsers where
 
+import qualified Data.Map.Strict as M
 import qualified Data.Text as T
 import Data.Void
 import System.Exit
@@ -34,3 +35,17 @@ delimited p delim = Text.Megaparsec.Char.space *> sepEndBy p (delim *> Text.Mega
 
 spaced :: Parser a -> Parser [a]
 spaced p = Text.Megaparsec.Char.space *> sepEndBy p Text.Megaparsec.Char.space
+
+linesOf :: Parser a -> Parser [a]
+linesOf p = sepEndBy p eol
+
+indexed :: Parser a -> Parser (M.Map (Int, Int) a)
+indexed p = do
+  rows <- many (some p <* eol)
+  pure
+    ( M.fromList
+        [ ((i, j), x)
+          | (i, row) <- zip [0 ..] rows,
+            (j, x) <- zip [0 ..] row
+        ]
+    )

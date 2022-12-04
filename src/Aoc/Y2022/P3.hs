@@ -36,7 +36,7 @@ parseRucksack = do
   pure (V.slice 0 half items, V.slice half half items)
 
 parser :: Parser ProblemInput
-parser = V.fromList <$> sepEndBy parseRucksack eol <* eof
+parser = V.fromList <$> P.linesOf parseRucksack <* eof
 
 solution :: Solution
 solution input = do
