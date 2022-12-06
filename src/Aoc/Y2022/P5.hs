@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Aoc.Y2022.P5 where
@@ -5,12 +6,13 @@ module Aoc.Y2022.P5 where
 import Aoc (Solution)
 import Aoc.Parsers (Parser)
 import qualified Aoc.Parsers as P
+import Control.Monad
+import Control.Monad.State
 import Data.Functor (($>))
 import Data.List (sort)
 import qualified Data.Map.Strict as M
 import Data.Maybe (catMaybes)
 import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
 import Text.Megaparsec
 import Text.Megaparsec.Char
 
@@ -36,6 +38,8 @@ type Stack = [Crate]
 type Stacks = M.Map Int Stack
 
 type ProblemInput = (Stacks, [Order])
+
+type CargoState = Stacks
 
 parseCrate :: Parser T.Text
 parseCrate = chunk "[" *> fmap (T.pack . pure) letterChar <* chunk "]"
@@ -68,55 +72,38 @@ createStacks grid =
       mkStack col = catMaybes [grid M.!? (row, col) | row <- rowRange]
    in M.fromList [(col + 1, mkStack col) | col <- cols]
 
-pop :: Stack -> (Maybe Crate, Stack)
-pop [] = (Nothing, [])
-pop (x : xs) = (Just x, xs)
+move :: MonadState CargoState m => Int -> Int -> m ()
+move from to = do
+  stacks <- get
+  case (stacks M.!? from, stacks M.!? to) of
+    (Just (s : ss), Just dest) -> do
+      modify (M.insert from ss)
+      modify (M.insert to (s : dest))
+    _ -> pure ()
 
-push :: Crate -> Stack -> Stack
-push x xs = x : xs
+followOrder :: MonadState CargoState m => Order -> m ()
+followOrder order = replicateM_ (orderCount order) (move (orderSource order) (orderDest order))
 
-shift :: Int -> Stack -> Stack -> (Stack, Stack)
-shift 0 x y = (x, y)
-shift n x y = shift (n - 1) x' y'
-  where
-    (z, x') = pop x
-    y' = case z of
-      Just z' -> push z' y
-      Nothing -> y
+followOrder' :: MonadState CargoState m => Order -> m ()
+followOrder' order = do
+  stacks <- get
+  let from = orderSource order
+      to = orderDest order
+      cnt = orderCount order
+  case (stacks M.!? from, stacks M.!? to) of
+    (Just source, Just dest) -> do
+      modify (M.insert from (drop cnt source))
+      modify (M.insert to (take cnt source ++ dest))
+    _ -> pure ()
 
-followOrder :: Stacks -> Order -> Stacks
-followOrder stacks order =
-  let cnt = orderCount order
-      source = orderSource order
-      dest = orderDest order
-   in case (stacks M.!? source, stacks M.!? dest) of
-        (Just sourceStack, Just destStack) -> M.insert dest destStack' (M.insert source sourceStack' stacks)
-          where
-            (sourceStack', destStack') = shift cnt sourceStack destStack
-        _ -> stacks
-
-followOrder' :: Stacks -> Order -> Stacks
-followOrder' stacks order =
-  let cnt = orderCount order
-      source = orderSource order
-      dest = orderDest order
-   in case (stacks M.!? source, stacks M.!? dest) of
-        (Just sourceStack, Just destStack) -> M.insert dest destStack' (M.insert source sourceStack' stacks)
-          where
-            sourceStack' = drop cnt sourceStack
-            destStack' = take cnt sourceStack ++ destStack
-        _ -> stacks
-
-followOrders :: Stacks -> [Order] -> Stacks
-followOrders = foldl followOrder
-
-followOrders' :: Stacks -> [Order] -> Stacks
-followOrders' = foldl followOrder'
+safeHead :: [a] -> Maybe a
+safeHead [] = Nothing
+safeHead (x : _) = Just x
 
 topCrates :: Stacks -> [Crate]
 topCrates stacks =
   let cols = sort (M.keys stacks)
-   in catMaybes [fst (pop (stacks M.! c)) | c <- cols]
+   in catMaybes [safeHead (stacks M.! c) | c <- cols]
 
 solution :: Solution
 solution input = do
@@ -125,7 +112,9 @@ solution input = do
   solvePart2 x >>= print
 
 solvePart1 :: ProblemInput -> IO T.Text
-solvePart1 (stacks, orders) = pure . T.concat . topCrates . followOrders stacks $ orders
+solvePart1 (stacks, orders) =
+  pure . T.concat . topCrates . flip execState stacks $ mapM_ followOrder orders
 
 solvePart2 :: ProblemInput -> IO T.Text
-solvePart2 (stacks, orders) = pure . T.concat . topCrates . followOrders' stacks $ orders
+solvePart2 (stacks, orders) =
+  pure . T.concat . topCrates . flip execState stacks $ mapM_ followOrder' orders

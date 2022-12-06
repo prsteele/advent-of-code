@@ -82,6 +82,7 @@ library
                     , containers
                     , extra
                     , megaparsec
+                    , mtl
                     , primitive
                     , recursion-schemes
                     , text
