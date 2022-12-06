@@ -5,11 +5,7 @@ module Aoc.Y2022.P4 where
 import Aoc (Solution)
 import Aoc.Parsers (Parser)
 import qualified Aoc.Parsers as P
-import qualified Data.Set as S
-import qualified Data.Text as T
-import qualified Data.Vector as V
 import Text.Megaparsec
-import Text.Megaparsec.Char
 
 type ProblemInput = [(Range, Range)]
 
