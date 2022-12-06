@@ -107,7 +107,8 @@ test-suite tests
   main-is:            Spec.hs
   hs-source-dirs:     test
   ghc-options:        -threaded -with-rtsopts=-N -Wall
-  other-modules:      Aoc.Y2020.P1Spec
+  other-modules:      Aoc.ParsersSpec
+                    , Aoc.Y2020.P1Spec
                     , Aoc.Y2021.P1Spec
                     , Aoc.Y2021.P2Spec
                     , Aoc.Y2021.P3Spec
@@ -163,6 +164,7 @@ test-suite tests
   build-depends:      base ^>=4.15.1.0
                     , advent-of-code
                     , QuickCheck
+                    , containers
                     , hspec
                     , megaparsec
                     , text

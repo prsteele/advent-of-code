@@ -4,7 +4,7 @@ import qualified Data.Map.Strict as M
 import qualified Data.Text as T
 import Data.Void
 import System.Exit
-import Text.Megaparsec
+import Text.Megaparsec hiding (parse)
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer as L
 
@@ -15,7 +15,7 @@ parseText p = runParser p "<string>"
 
 parse :: Parser a -> T.Text -> IO a
 parse p x = case parseText p x of
-  Left err -> print err >> exitFailure
+  Left err -> putStrLn (errorBundlePretty err) >> exitFailure
   Right result -> pure result
 
 int :: Parser Int
@@ -41,7 +41,7 @@ linesOf p = sepEndBy p eol
 
 indexed :: Parser a -> Parser (M.Map (Int, Int) a)
 indexed p = do
-  rows <- many (some p <* eol)
+  rows <- many (many p <* eol)
   pure
     ( M.fromList
         [ ((i, j), x)
