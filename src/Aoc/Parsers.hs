@@ -7,6 +7,7 @@ import System.Exit
 import Text.Megaparsec hiding (parse)
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer as L
+import Text.Read (readMaybe)
 
 type Parser = Parsec Void T.Text
 
@@ -49,3 +50,10 @@ indexed p = do
             (j, x) <- zip [0 ..] row
         ]
     )
+
+singleDigit :: Parser Int
+singleDigit = do
+  d <- numberChar
+  case readMaybe [d] of
+    Just n -> pure n
+    Nothing -> fail ("Cannot parse " <> [d] <> " as digit")
