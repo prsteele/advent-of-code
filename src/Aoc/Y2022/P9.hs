@@ -9,18 +9,15 @@ import qualified Aoc.Parsers as P
 import Control.Monad
 import Control.Monad.State
 import Data.Functor (($>))
-import Data.IntMap (difference)
-import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
-import qualified Data.Vector as V
 import Text.Megaparsec
 import Text.Megaparsec.Char
 
-data Direction = U | D | L | R
+data Direction = U | D | L | R | UR | UL | DR | DL | Z
   deriving
-    (Show, Read)
+    (Eq, Show, Read)
 
 data Move = Move Direction Int
   deriving
@@ -41,53 +38,68 @@ type ProblemInput = [Move]
 parser :: Parser ProblemInput
 parser = P.linesOf parseMove
 
-type Coordinate = (Int, Int)
+type Knot = (Int, Int)
 
-data Knot = Knot Coordinate Coordinate
-  deriving (Show, Read)
+type Rope = [Knot]
 
-moveCoordinate :: Coordinate -> Direction -> Coordinate
-moveCoordinate (x, y) U = (x, y + 1)
-moveCoordinate (x, y) D = (x, y -1)
-moveCoordinate (x, y) L = (x -1, y)
-moveCoordinate (x, y) R = (x + 1, y)
+type KnotPair = (Knot, Knot)
 
-isDiagonal :: Knot -> Bool
-isDiagonal (Knot (hx, hy) (tx, ty)) = hx /= tx && hy /= ty
+moveKnot :: Knot -> Direction -> Knot
+moveKnot (x, y) U = (x, y + 1)
+moveKnot (x, y) D = (x, y -1)
+moveKnot (x, y) L = (x -1, y)
+moveKnot (x, y) R = (x + 1, y)
+moveKnot c UR = (`moveKnot` U) . (`moveKnot` R) $ c
+moveKnot c UL = (`moveKnot` U) . (`moveKnot` L) $ c
+moveKnot c DR = (`moveKnot` D) . (`moveKnot` R) $ c
+moveKnot c DL = (`moveKnot` D) . (`moveKnot` L) $ c
+moveKnot c Z = c
 
-isOverlapping :: Knot -> Bool
-isOverlapping (Knot h t) = h == t
+adjacent :: Knot -> Knot -> Bool
+adjacent (hx, hy) (tx, ty) = max (abs (hx - tx)) (abs (hy - ty)) <= 1
 
-isApart :: Knot -> Bool
-isApart (Knot (hx, hy) (tx, ty)) = max (abs (hx - tx)) (abs (hy - ty)) > 1
-
-move' :: Knot -> Direction -> Knot
-move' knot@(Knot h t) direction
-  | isOverlapping knot = Knot h' t
-  | isDiagonal knot =
-    if isApart (Knot h' t)
-      then Knot h' h
-      else Knot h' t
-  | otherwise =
-    if isApart (Knot h' t)
-      then Knot h' h
-      else Knot h' t
+-- If the head moves in a direction, how should the tail move?
+moveTail :: KnotPair -> Knot
+moveTail (h@(hx, hy), t@(tx, ty))
+  -- If the new head is still adjacent, the tail doesn't move
+  | adjacent h t = t
+  -- Chase the head
+  | otherwise = moveKnot t d
   where
-    h' = moveCoordinate h direction
+    d = case (compare tx hx, compare ty hy) of
+      (LT, LT) -> UR
+      (LT, EQ) -> R
+      (LT, GT) -> DR
+      (EQ, LT) -> U
+      (EQ, EQ) -> Z
+      (EQ, GT) -> D
+      (GT, LT) -> UL
+      (GT, EQ) -> L
+      (GT, GT) -> DL
 
-type KnotState = (Knot, [Coordinate])
+move' :: Rope -> Direction -> Rope
+move' [] _ = []
+move' [h] d = [moveKnot h d]
+move' rope@(origHead : _) d = chase (moveKnot (moveKnot origHead d) d) rope
+  where
+    chase _ [] = []
+    chase h (t : rest) = t' : chase t' rest
+      where
+        t' = moveTail (h, t)
 
-move :: MonadState KnotState m => Direction -> m ()
+type RopeState = (Rope, S.Set Knot)
+
+move :: MonadState RopeState m => Direction -> m ()
 move direction = do
-  (knot, record) <- get
-  put (move' knot direction, record)
+  (rope, visited) <- get
+  put (move' rope direction, visited)
 
-recordTail :: MonadState KnotState m => m ()
+recordTail :: MonadState RopeState m => m ()
 recordTail = do
-  (knot@(Knot _ t), record) <- get
-  put (knot, t : record)
+  (rope, visited) <- get
+  put (rope, S.insert (last rope) visited)
 
-followMove :: MonadState KnotState m => Move -> m ()
+followMove :: MonadState RopeState m => Move -> m ()
 followMove (Move direction len) =
   replicateM_ len (move direction >> recordTail)
 
@@ -102,12 +114,13 @@ solution input = do
 
 solvePart1 :: ProblemInput -> IO T.Text
 solvePart1 moves =
-  let (_, record) = execState (mapM_ followMove moves) (Knot (0, 0) (0, 0), [])
-      unique = S.fromList record
-   in pure . tshow . S.size $ unique
+  let (_, visited) = execState (mapM_ followMove moves) (replicate 2 (0, 0), S.singleton (0, 0))
+   in pure . tshow . S.size $ visited
 
 solvePart2 :: ProblemInput -> IO T.Text
-solvePart2 _ = pure ("Not yet implemented")
+solvePart2 moves =
+  let (_, visited) = execState (mapM_ followMove moves) (replicate 10 (0, 0), S.singleton (0, 0))
+   in pure . tshow . S.size $ visited
 
 runOn :: FilePath -> IO ()
 runOn = TIO.readFile >=> solution
