@@ -6,6 +6,8 @@ import Aoc (Solution)
 import Aoc.Parsers (Parser)
 import qualified Aoc.Parsers as P
 import Control.Monad
+import Control.Monad.State
+import Data.Functor (($>))
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import qualified Data.Text as T
